@@ -27,4 +27,7 @@ public interface BillRepository extends JpaRepository<Bill,Integer> {
 
     @Query("SELECT new com.project.electricityBillManagement.payload.wrapper.HistoryWrapper(b.billNo,b.arrears,b.totalAmount,b.paidAmount,b.units,b.fromDate,b.toDate,b.endDate,b.status,b.adminId) from Bill b where b.consumerId = ?1")
     List<HistoryWrapper> findBillsByConsumerId(int consumerId);
+
+    @Query("SELECT new com.project.electricityBillManagement.payload.wrapper.HistoryWrapper(b.billNo,b.arrears,b.totalAmount,b.paidAmount,b.units,b.fromDate,b.toDate,b.endDate,b.status,b.adminId) from Bill b where b.billNo = ?1")
+    List<HistoryWrapper> findBillsByBillNo(int BillNo);
 }

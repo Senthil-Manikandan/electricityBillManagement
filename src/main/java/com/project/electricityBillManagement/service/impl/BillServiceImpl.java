@@ -8,10 +8,7 @@ import com.project.electricityBillManagement.model.Admin;
 import com.project.electricityBillManagement.model.Announcement;
 import com.project.electricityBillManagement.model.Bill;
 import com.project.electricityBillManagement.model.Consumer;
-import com.project.electricityBillManagement.payload.request.BillRequest;
-import com.project.electricityBillManagement.payload.request.EditBillRequest;
-import com.project.electricityBillManagement.payload.request.PayBillRequest;
-import com.project.electricityBillManagement.payload.request.PaymentRequest;
+import com.project.electricityBillManagement.payload.request.*;
 import com.project.electricityBillManagement.payload.wrapper.HistoryWrapper;
 import com.project.electricityBillManagement.repo.AdminRepository;
 import com.project.electricityBillManagement.repo.BillRepository;
@@ -167,6 +164,18 @@ public class BillServiceImpl implements IBillService {
         }catch (Exception ex){
             ex.printStackTrace();
             throw new CustomException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public List<HistoryWrapper> generateReport(GenerateBillRequest request) {
+        try{
+            List<HistoryWrapper> result = billRepository.findBillsByBillNo(request.getBillNo());
+            return result;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw new CustomException(ex.getMessage());
+
         }
     }
 }

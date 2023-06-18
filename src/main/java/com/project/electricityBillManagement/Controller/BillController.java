@@ -1,17 +1,19 @@
 package com.project.electricityBillManagement.Controller;
 
-import com.project.electricityBillManagement.payload.request.BillRequest;
-import com.project.electricityBillManagement.payload.request.EditBillRequest;
-import com.project.electricityBillManagement.payload.request.PayBillRequest;
-import com.project.electricityBillManagement.payload.request.PaymentRequest;
+import com.project.electricityBillManagement.payload.request.*;
 import com.project.electricityBillManagement.payload.wrapper.HistoryWrapper;
 import com.project.electricityBillManagement.service.inter.IBillService;
+import com.project.electricityBillManagement.utils.BillPDFExporter;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.http.HttpServletResponse;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -70,6 +72,25 @@ public class BillController {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }catch (Exception ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/generateBill")
+    public ResponseEntity<?> generateBill(@RequestBody GenerateBillRequest request, HttpServletResponse response){
+        try {
+            response.setContentType("application/pdf");
+            DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
+            String currentDateTime = dateFormat.format(new Date());
+            String headerkey = "Content-Disposition";
+            String headervalue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
+            response.setHeader(headerkey, headervalue);
+            List<HistoryWrapper> result = billService.generateReport(request);
+            BillPDFExporter generator = new BillPDFExporter();
+            generator.generate(result,response);
+            return new ResponseEntity<>(result,HttpStatus.OK);
+        }
+        catch (Exception ex){
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
