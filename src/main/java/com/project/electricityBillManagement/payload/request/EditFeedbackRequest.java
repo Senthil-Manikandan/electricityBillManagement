@@ -7,6 +7,5 @@ import lombok.*;
 @NoArgsConstructor
 public class EditFeedbackRequest {
     int feedbackId;
-    int consumerId;
     String feedback;
 }

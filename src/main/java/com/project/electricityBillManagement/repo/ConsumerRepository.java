@@ -20,6 +20,8 @@ public interface ConsumerRepository extends JpaRepository <Consumer,Integer>{
 
     Consumer findByEmail(String email);
 
+    Optional<Consumer> findConsumerByMeterNo(String meterNo);
+
 
     @Query("select new com.project.electricityBillManagement.payload.wrapper.ConsumerWrapper(c.firstName,c.lastName,c.email,c.phoneNo,c.address,c.meterNo,c.tariff,c.status) from Consumer c")
     List<ConsumerWrapper> findAllByWrapper();

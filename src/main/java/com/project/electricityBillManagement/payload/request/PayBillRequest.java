@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PayBillRequest {
     int billNo;
-    int customerNo;
+    String email;
+
+    String paymentMethod;
 
     double paidAmt;
 }

@@ -22,5 +22,6 @@ public class HistoryWrapper {
     BillStatus status;
 
     int adminId;
+    String paymentMethod;
 
 }

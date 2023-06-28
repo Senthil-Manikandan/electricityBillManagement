@@ -1,5 +1,6 @@
 package com.project.electricityBillManagement.payload.request;
 
+import com.project.electricityBillManagement.enumeration.BillStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementRequest {
-    String announcement;
+@AllArgsConstructor
+public class BillStatusRequest {
+    BillStatus billStatus;
 }

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementRequest {
-    String announcement;
+@AllArgsConstructor
+public class DeleteBillRequest {
+    int billNo;
 }

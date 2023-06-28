@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,9 +32,11 @@ public class FeedbackImpl implements IFeedbackService {
     public String createFeedback(FeedbackRequest request) {
         try{
             if(!jwtAuthenticationFilter.IsAdmin()){
+                String email = jwtAuthenticationFilter.getUserName();
+                Consumer c = consumerRepository.findByEmail(email);
                 FeedBack fb = FeedBack.builder()
                         .review(request.getFeedback())
-                        .consumerId(request.getConsumerId()).build();
+                        .consumerId(c.getConsumerId()).build();
                 feedBackRepository.save(fb);
                 return "created successfully";
             }
@@ -49,11 +52,11 @@ public class FeedbackImpl implements IFeedbackService {
     public String editFeedback(EditFeedbackRequest request) {
         try{
             if(!jwtAuthenticationFilter.IsAdmin()){
+                String email = jwtAuthenticationFilter.getUserName();
+                Consumer c = consumerRepository.findByEmail(email);
                 FeedBack fb = feedBackRepository.findFeedBackByFeedbackId(request.getFeedbackId());
-                Optional<Consumer> cb = consumerRepository.findByConsumerId(request.getConsumerId());
-                String userName = jwtAuthenticationFilter.getUserName();
-                if(cb != null && fb != null){
-                    int i = feedBackRepository.updateFeedback(request.getFeedback(),request.getConsumerId(),request.getFeedbackId());
+                if(c != null && fb != null){
+                    int i = feedBackRepository.updateFeedback(request.getFeedback(),c.getConsumerId(),request.getFeedbackId());
                     if(i>0){
                         return "edit successful";
                     }else{
@@ -75,9 +78,10 @@ public class FeedbackImpl implements IFeedbackService {
     public String deleteFeedback(EditFeedbackRequest request) {
         try{
             if(!jwtAuthenticationFilter.IsAdmin()){
-                Optional<Consumer> cn = consumerRepository.findByConsumerId(request.getConsumerId());
+                String email = jwtAuthenticationFilter.getUserName();
+                Consumer c = consumerRepository.findByEmail(email);
                 FeedBack fb = feedBackRepository.findFeedBackByFeedbackId(request.getFeedbackId());
-                if(cn != null && fb != null){
+                if(c != null && fb != null){
                     feedBackRepository.deleteFeedBackByFeedbackId(request.getFeedbackId());
                     return "deleted successfully";
                 }else{
@@ -89,6 +93,18 @@ public class FeedbackImpl implements IFeedbackService {
         }catch (Exception ex){
             ex.printStackTrace();
             throw  new CustomException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public List<FeedBack> getFeedBacks() {
+        if(!jwtAuthenticationFilter.IsAdmin()){
+            String email = jwtAuthenticationFilter.getUserName();
+            Consumer c = consumerRepository.findByEmail(email);
+            List<FeedBack> result = feedBackRepository.findFeedBacksByConsumerId(c.getConsumerId());
+            return result;
+        }else{
+            return feedBackRepository.findAll();
         }
     }
 }

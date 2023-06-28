@@ -5,7 +5,6 @@ import com.project.electricityBillManagement.enumeration.Tariff;
 import com.project.electricityBillManagement.exception.CustomException;
 import com.project.electricityBillManagement.jwt.JwtAuthenticationFilter;
 import com.project.electricityBillManagement.model.Admin;
-import com.project.electricityBillManagement.model.Announcement;
 import com.project.electricityBillManagement.model.Bill;
 import com.project.electricityBillManagement.model.Consumer;
 import com.project.electricityBillManagement.payload.request.*;
@@ -15,13 +14,16 @@ import com.project.electricityBillManagement.repo.BillRepository;
 import com.project.electricityBillManagement.repo.ConsumerRepository;
 import com.project.electricityBillManagement.service.inter.IBillService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BillServiceImpl implements IBillService {
 
     private final BillRepository billRepository;
@@ -55,7 +57,7 @@ public class BillServiceImpl implements IBillService {
            if(filter.IsAdmin()){
                String userName = filter.getUserName();
                Admin ad = adminRepository.findAdminByEmail(userName);
-               Consumer c = csi.getConsumer(request.getConsumerId());
+               Consumer c = csi.getConsumer(request.getMeterNo());
                double totalAmt = calculateBill(c.getTariff(),request.getUnits(), c.getArrears());
 
                Bill bill = Bill.builder()
@@ -66,8 +68,9 @@ public class BillServiceImpl implements IBillService {
                        .units(request.getUnits())
                        .totalAmount(totalAmt)
                        .adminId(ad.getAdminId())
-                       .consumerId(request.getConsumerId())
+                       .consumerId(c.getConsumerId())
                        .status(BillStatus.NotPaid)
+                       .paymentMethod("choose options")
                        .build();
 
                billRepository.save(bill);
@@ -88,7 +91,7 @@ public class BillServiceImpl implements IBillService {
             if(filter.IsAdmin()){
                 Bill b = billRepository.findBillByBillNo(request.getBillNo());
                 if( b != null){
-                    Consumer c = csi.getConsumer(request.getConsumerId());
+                    Consumer c = csi.getConsumer(request.getMeterNo());
                     double totalAmt = calculateBill(c.getTariff(),request.getUnits(), c.getArrears());
                     int i = billRepository.updateBill(c.getArrears(),
                             request.getFromDate(),
@@ -96,7 +99,7 @@ public class BillServiceImpl implements IBillService {
                             request.getEndDate(),
                             request.getUnits(),
                             request.getStatus(),
-                            request.getConsumerId(),
+                            c.getConsumerId(),
                             totalAmt,
                             request.getBillNo());
                     if (i>0)
@@ -118,9 +121,9 @@ public class BillServiceImpl implements IBillService {
     @Override
     public String payBill(PayBillRequest request) {
         try{
-            if(!filter.IsAdmin()){
+
                 Bill b = billRepository.findBillByBillNo(request.getBillNo());
-                Consumer c = csi.getConsumer(request.getCustomerNo());
+                Consumer c = consumerRepository.findByEmail(request.getEmail());
                 double dif = request.getPaidAmt() -b.getTotalAmount() ;
                 if(dif >= 0){
                     int i;
@@ -130,22 +133,20 @@ public class BillServiceImpl implements IBillService {
                     else
                         i = billRepository.updateBillStatus(BillStatus.Paid,b.getPaidAmount(), request.getBillNo());
 
-                    int j = consumerRepository.updateArrears(dif, request.getCustomerNo());
+                    int j = consumerRepository.updateArrears(dif, c.getConsumerId());
                     if(i>0 && j>0)
                         return "payment successful";
                     else
                         return "error during update";
                 }else{
                     int i = billRepository.updateBillStatus(BillStatus.PartiallyPaid, request.getPaidAmt(), request.getBillNo());
-                    int j = consumerRepository.updateArrears(dif, request.getCustomerNo());
+                    int j = consumerRepository.updateArrears(dif, c.getConsumerId());
                     if(i>0 && j>0)
                         return "payment is partially done remit the balance during next month";
                     else
                         return "error during update";
                 }
-            }else{
-                throw new CustomException("Not a consumer");
-            }
+
         }catch(Exception ex){
             ex.printStackTrace();
             throw  new CustomException(ex.getMessage());
@@ -153,10 +154,11 @@ public class BillServiceImpl implements IBillService {
     }
 
     @Override
-    public List<HistoryWrapper> paymentHistory(PaymentRequest request) {
+    public List<HistoryWrapper> paymentHistory() {
         try{
             if(!filter.IsAdmin()){
-                List<HistoryWrapper> result = billRepository.findBillsByConsumerId(request.getConsumerId());
+                Consumer c = consumerRepository.findByEmail(filter.getUserName());
+                List<HistoryWrapper> result = billRepository.findBillsByConsumerId(c.getConsumerId());
                 return result;
             }else{
                 throw new CustomException("not a consumer");
@@ -175,7 +177,119 @@ public class BillServiceImpl implements IBillService {
         }catch (Exception ex){
             ex.printStackTrace();
             throw new CustomException(ex.getMessage());
+        }
+    }
 
+    @Override
+    public List<Bill> getBill() {
+        try{
+            if(filter.IsAdmin()){
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MONTH, -1);
+                Date oneMonthAgo = calendar.getTime();
+                String email = filter.getUserName();
+                Admin ad  = adminRepository.findAdminByEmail(email);
+                log.info("Admin Mail : " +email);
+                log.info("Date  : " +oneMonthAgo);
+                List<Bill> result = billRepository.findBillsByFromDate(oneMonthAgo,ad.getAdminId());
+                for (Bill b: result){
+                    log.info("b to string :"+ b.toString());
+
+                }
+                return result;
+            }
+            else{
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MONTH, -1);
+                Date oneMonthAgo = calendar.getTime();
+                String email = filter.getUserName();
+                Consumer ad  = consumerRepository.findByEmail(email);
+                log.info("Admin Mail : " +email);
+                log.info("Date  : " +oneMonthAgo);
+                List<Bill> result = billRepository.findBillsByFromDateConsumer(oneMonthAgo,ad.getConsumerId());
+                for (Bill b: result){
+                    log.info("b to string :"+ b.toString());
+
+                }
+                return result;
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw new CustomException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public String deleteBill(DeleteBillRequest request) {
+        try{
+            if(filter.IsAdmin()){
+                Bill b = billRepository.findBillByBillNo(request.getBillNo());
+                if(b != null){
+                    billRepository.deleteBillByBillNo(request.getBillNo());
+                    return "Delete Successfully";
+                }else{
+                    throw new CustomException("Bill Number not exist");
+                }
+            }else{
+                throw new CustomException("Not a Admin");
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw new CustomException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public List<Bill> getBillbyStatusAdmin(BillStatusRequest request) {
+        try{
+            String email = filter.getUserName();
+            Admin ad = adminRepository.findAdminByEmail(email);
+            if(ad != null){
+                log.info("Bill : "+request.getBillStatus());
+                log.info("admin id : "+ad.getAdminId());
+                List<Bill> result = billRepository.findBillsByStatusAdmin(request.getBillStatus(),ad.getAdminId());
+                return result;
+            }else{
+                throw new CustomException("User Not exist");
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new CustomException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public List<Bill> getBillbyStatusConsumer(BillStatusRequest request) {
+        try{
+            String email = filter.getUserName();
+            Consumer ad = consumerRepository.findByEmail(email);
+            if(ad != null){
+                log.info("Bill : "+request.getBillStatus());
+                log.info("admin id : "+ad.getConsumerId());
+                List<Bill> result = billRepository.findBillsByStatusConsumer(request.getBillStatus(),ad.getConsumerId());
+                return result;
+            }else{
+                throw new CustomException("User not exist");
+            }
+
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new CustomException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public Bill getBillByBillNo(DeleteBillRequest request) {
+        try{
+            Bill b = billRepository.findBillByBillNo(request.getBillNo());
+            if(b != null)
+                return b;
+            else
+                throw new CustomException("Bill number not found");
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            throw new CustomException(ex.getMessage());
         }
     }
 }

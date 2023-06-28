@@ -1,4 +1,4 @@
-package com.project.electricityBillManagement.payload.request;
+package com.project.electricityBillManagement.payload.wrapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementRequest {
-    String announcement;
+public class ResponseMessage {
+    String message;
 }

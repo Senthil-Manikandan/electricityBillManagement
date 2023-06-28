@@ -59,6 +59,10 @@ public class Bill implements Serializable {
     double paidAmount;
 
     @NotNull
+    @Column(name = "paymentMethod")
+    String paymentMethod;
+
+    @NotNull
     @Column(name = "consumerId")
     int consumerId;
 
@@ -68,18 +72,18 @@ public class Bill implements Serializable {
 
     @Override
     public String toString() {
-        return "Bill{" +
-                "billNo=" + billNo +
-                ", arrears=" + arrears +
-                ", units=" + units +
-                ", fromDate=" + fromDate +
-                ", toDate=" + toDate +
-                ", endDate=" + endDate +
-                ", status=" + status +
-                ", totalAmount=" + totalAmount +
-                ", paidAmount=" + paidAmount +
-                ", consumerId=" + consumerId +
-                ", adminId=" + adminId +
-                '}';
+        return "[{" +
+                "\"billNo\":" + billNo +
+                ", \"arrears\":" + arrears +
+                ", \"units\":" + units +
+                ", \"fromDate\":\"" + fromDate + "\"" +
+                ", \"toDate\":\"" + toDate + "\"" +
+                ", \"endDate\":\"" + endDate + "\"" +
+                ", \"status\":\"" + status + "\"" +
+                ", \"totalAmount\":" + totalAmount +
+                ", \"paidAmount\":" + paidAmount +
+                ", \"consumerId\":" + consumerId +
+                ", \"adminId\":" + adminId +
+                "}]";
     }
 }

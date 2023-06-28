@@ -1,5 +1,6 @@
 package com.project.electricityBillManagement.Controller;
 
+import com.project.electricityBillManagement.model.FeedBack;
 import com.project.electricityBillManagement.payload.request.EditFeedbackRequest;
 import com.project.electricityBillManagement.payload.request.FeedbackRequest;
 import com.project.electricityBillManagement.service.inter.IFeedbackService;
@@ -8,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/feedback")
@@ -51,6 +56,20 @@ public class FeedBackController {
                 return new ResponseEntity<>(resposne, HttpStatus.BAD_REQUEST);
         }catch (Exception ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getFeedback")
+    public ResponseEntity<List<FeedBack>> getFeedbacks(){
+        try{
+            List<FeedBack> result = feedbackService.getFeedBacks();
+            if(result != null)
+                return new ResponseEntity<>(result,HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.BAD_REQUEST);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

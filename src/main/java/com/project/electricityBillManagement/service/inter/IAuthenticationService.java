@@ -1,9 +1,13 @@
 package com.project.electricityBillManagement.service.inter;
 
+import com.project.electricityBillManagement.model.Consumer;
 import com.project.electricityBillManagement.payload.request.ForgotPasswordRequest;
 import com.project.electricityBillManagement.payload.request.LoginRequest;
 import com.project.electricityBillManagement.payload.request.RegisterRequest;
 import com.project.electricityBillManagement.payload.wrapper.AuthenticationResponse;
+import com.project.electricityBillManagement.payload.wrapper.ResponseMessage;
+
+import java.util.List;
 
 public interface IAuthenticationService {
 
@@ -11,7 +15,11 @@ public interface IAuthenticationService {
 
     AuthenticationResponse login(LoginRequest request);
 
-    String forgotPassword(ForgotPasswordRequest request);
+    ResponseMessage forgotPassword(ForgotPasswordRequest request);
 
     String changePassword(LoginRequest request);
+
+    List<Consumer> getConsumers();
+
+    ResponseMessage checkToken(String token);
 }

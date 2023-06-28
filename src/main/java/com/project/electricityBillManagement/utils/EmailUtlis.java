@@ -41,7 +41,17 @@ public class EmailUtlis {
         helper.setFrom("windsorsuite555@gmail.com");
         helper.setTo(to);
         helper.setSubject(subject);
-        String htmlMsg = "<p><b>Reset Password</b><br><b>Email: </b> " + to + " <br><b>Url: </b> " + url + "<br><a href=\"http://localhost:4200/\">Click here to login</a></p>";
+        String htmlMsg = "<html><body style=\"font-family: Arial, sans-serif;\">"
+                + "<h2 style=\"color: #008080;\">Reset Password</h2>"
+                + "<p><strong>Email:</strong> " + to + "</p>"
+                + "<p><strong>Password:</strong> 123456</p>"
+                + "<p><strong>URL:</strong> " + url + "</p>"
+                + "<p>Please click the following link to reset your password:</p>"
+                + "<p><a href=\"http://localhost:4200/reset-password\">Reset Password</a></p>"
+                + "<p>If you did not request a password reset, please ignore this email.</p>"
+                + "<p>Best regards,<br>Electricity Bill Management Team</p>"
+                + "</body></html>";
+//        String htmlMsg = "<p><b>Reset Password</b><br><b>Email: </b> " + to + " <br><br><b>Password: </b> 123456 <br><b>Url: </b> " + url + "<br><a href=\"http://localhost:4200/\">Click here to login</a></p>";
         message.setContent(htmlMsg,"text/html");
         mailSender.send(message);
     }

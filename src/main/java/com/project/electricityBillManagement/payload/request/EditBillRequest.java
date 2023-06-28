@@ -18,7 +18,7 @@ public class EditBillRequest {
     Date toDate;
     Date endDate;
     BillStatus status;
-    int consumerId;
+    String meterNo;
     int billNo;
 
 }

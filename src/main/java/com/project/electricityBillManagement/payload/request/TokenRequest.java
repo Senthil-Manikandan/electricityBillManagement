@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnnouncementRequest {
-    String announcement;
+public class TokenRequest {
+    String token;
 }

@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedbackRequest {
-    int consumerId;
+
     String feedback;
 }

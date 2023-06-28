@@ -75,5 +75,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return jwtService.extractUserName(token);
     }
 
+    public boolean checkTokenValid(String jwtuser){
+//        jwt = authHeader.substring(7);
+        log.info("filter inside :: " + jwtuser);
+        token = jwtuser;
+        String userEmail = jwtService.extractUserName(jwtuser);
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+        if(jwtService.isTokenValid(token,userDetails)){
+            return true;
+        }
+        return false;
+    }
+
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class AdminRestController {
 
     private final IAdminService adminService;

@@ -1,7 +1,8 @@
-package com.project.electricityBillManagement.payload.request;
+package com.project.electricityBillManagement.payload.wrapper;
 
 import com.project.electricityBillManagement.enumeration.BillStatus;
-
+import com.project.electricityBillManagement.enumeration.Status;
+import com.project.electricityBillManagement.enumeration.Tariff;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +14,19 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BillRequest {
+public class ConsumerDashboard {
+    double totalAmount;
+    double paidAmount;
     double units;
     Date fromDate;
     Date toDate;
     Date endDate;
-    BillStatus status;
+    BillStatus billStatus;
 
     String meterNo;
+
+    Tariff tariff;
+
+    Status consumerStatus;
+
 }

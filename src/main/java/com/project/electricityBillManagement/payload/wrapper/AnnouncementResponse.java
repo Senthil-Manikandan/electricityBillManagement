@@ -1,4 +1,4 @@
-package com.project.electricityBillManagement.payload.request;
+package com.project.electricityBillManagement.payload.wrapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class EditAnnouncementRequest {
+@AllArgsConstructor
+public class AnnouncementResponse {
+
     int announcementId;
-    String announcement;
+    String review;
 }
